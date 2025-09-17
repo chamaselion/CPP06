@@ -6,7 +6,7 @@
 /*   By: bszikora <bszikora@student.42helbronn.d    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 12:55:03 by bszikora          #+#    #+#             */
-/*   Updated: 2025/09/17 15:05:21 by bszikora         ###   ########.fr       */
+/*   Updated: 2025/09/17 16:36:45 by bszikora         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,29 +139,25 @@ int	check_type(std::string input, int *special)
     return type;
 }
 
-int	parse(int argc, char **argv)
+int invalid_case(int type)
 {
-	s_values pvalue;
-	char	*res;
-	int		special = 0;
-	int		type = TYPE_INVALID;
-	
-	std::string special_cases[5] = {"", "", "+inf", "-inf", "nan"};
-	std::string fspecial_cases[5] = {"", "", "+inff", "-inff", "nanf"};
+	if (type < 0)
+		return (std::cout << "This input is invalid for such conversions\n", 1);
+	return 0;
+}
+
+int	parse(int argc, char **argv, s_values *info)
+{
+	info->input = argv[1];
+	info->special = 0;
+	info->type = TYPE_INVALID;
 
 	if (argc > 2 || argc < 2)
-		return (1);
-	res = argv[1];
-
-	type = check_type(res, &special);
-	// if (res < 0)
-	// {
-	// 	pvalue.integernum = "";
-	// }
-	std::cout << "result: " << type << std::endl;
-	if (special)
-	{
-		std::cout << "special: " << special << std::endl;
-	}
+		return 1;
+	info->type = check_type(info->input, &info->special);
+	if (invalid_case(info->type))
+		return 1;
+	if (special_case(info->special))
+		return 1;
 	return 0;
 }

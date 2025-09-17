@@ -6,7 +6,7 @@
 /*   By: bszikora <bszikora@student.42helbronn.d    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 13:16:18 by bszikora          #+#    #+#             */
-/*   Updated: 2025/09/17 15:03:11 by bszikora         ###   ########.fr       */
+/*   Updated: 2025/09/17 16:34:16 by bszikora         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #include <iostream>
 #include <climits>
+#include <string>
 #include "ScalarConverter.hpp"
 
 enum ScalarType
@@ -29,13 +30,19 @@ enum ScalarType
 
 typedef struct Values
 {
-	std::string 	integernum;
-	std::string		floatingnum;
-	std::string		doublenum;
-	std::string		charchar;
+	int 			integernum;
+	float			floatingnum;
+	double			doublenum;
+	char			charchar;
+
+	std::string		input;
+
+	int				type;
+	int				special;
 } s_values;
 
-int	parse(int argc, char **argv);
-
+int	parse(int argc, char **argv, s_values *info);
+int special_case(int special);
+int handle_cases(s_values *info);
 
 #endif

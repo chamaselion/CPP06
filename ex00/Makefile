@@ -1,7 +1,7 @@
 NAME		=	convert
 CC		=	c++
-CFLAGS		=	-Wall -Wextra -Werror -std=c++98
-INCL_DIR	=	includes
+CFLAGS		=	-Wall -Wextra -Werror -std=c++17
+INCL_DIR	=	include
 SRC_DIR		=	sources
 OBJ_DIR		=	objects
 

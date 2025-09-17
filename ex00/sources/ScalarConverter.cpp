@@ -6,7 +6,7 @@
 /*   By: bszikora <bszikora@student.42helbronn.d    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 16:54:38 by bszikora          #+#    #+#             */
-/*   Updated: 2025/09/15 13:35:27 by bszikora         ###   ########.fr       */
+/*   Updated: 2025/09/17 16:37:43 by bszikora         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
  
  ScalarConverter::ScalarConverter() { }
  
- ScalarConverter::ScalarConverter(const ScalarConverter& other) { }
+ ScalarConverter::ScalarConverter(const ScalarConverter& other) { (void) other;}
  
  ScalarConverter& ScalarConverter::operator=(const ScalarConverter& other)
  {
@@ -28,11 +28,6 @@
 
 void	ScalarConverter::convert(const std::string &s)
  {
-	char	char_result;
-	int		int_result;
-	float	float_result;
-	double	double_result;
-
 	if(s.length() == 1)
 	{
 		
