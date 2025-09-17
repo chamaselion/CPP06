@@ -1,20 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   Tools.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bszikora <bszikora@student.42helbronn.d    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/15 13:22:15 by bszikora          #+#    #+#             */
-/*   Updated: 2025/09/17 13:22:59 by bszikora         ###   ########.fr       */
+/*   Created: 2025/09/17 13:16:18 by bszikora          #+#    #+#             */
+/*   Updated: 2025/09/17 13:20:01 by bszikora         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Tools.hpp"
+#ifndef TOOLS_HPP
+#define TOOLS_HPP
 
-int main(int argc, char **argv)
+#include <iostream>
+#include <climits>
+#include "ScalarConverter.hpp"
+
+enum ScalarType
 {
-	(void) argc;
-	std::cout << check_type(argv[1]) << std::endl;
-	
-}
+    TYPE_CHAR   = 0,
+    TYPE_INT    = 1,
+    TYPE_FLOAT  = 2,
+    TYPE_DOUBLE = 3,
+    TYPE_INVALID = -1
+};
+
+int	check_type(std::string input);
+
+
+#endif
