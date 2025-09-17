@@ -6,7 +6,7 @@
 /*   By: bszikora <bszikora@student.42helbronn.d    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 13:16:18 by bszikora          #+#    #+#             */
-/*   Updated: 2025/09/17 13:20:01 by bszikora         ###   ########.fr       */
+/*   Updated: 2025/09/17 15:03:11 by bszikora         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,19 @@ enum ScalarType
     TYPE_INT    = 1,
     TYPE_FLOAT  = 2,
     TYPE_DOUBLE = 3,
+
     TYPE_INVALID = -1
 };
 
-int	check_type(std::string input);
+typedef struct Values
+{
+	std::string 	integernum;
+	std::string		floatingnum;
+	std::string		doublenum;
+	std::string		charchar;
+} s_values;
+
+int	parse(int argc, char **argv);
 
 
 #endif

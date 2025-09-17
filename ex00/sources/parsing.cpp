@@ -6,7 +6,7 @@
 /*   By: bszikora <bszikora@student.42helbronn.d    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 12:55:03 by bszikora          #+#    #+#             */
-/*   Updated: 2025/09/17 13:39:41 by bszikora         ###   ########.fr       */
+/*   Updated: 2025/09/17 15:05:21 by bszikora         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,21 +51,117 @@ static bool	is_int(const std::string &s)
 	}
 }
 
-int	check_type(std::string input)
+static bool	is_numeric(const std::string &s, bool allowDot, bool &sawDot, bool &sawDigit)
 {
-	if (is_lchar(input))
-		return TYPE_CHAR;
-	if (is_schar(input))
-		return TYPE_CHAR;
-	if (is_int(input))
-		return TYPE_INT;
+	char	c;
+
+	for (size_t i = 0; i < s.size(); ++i)
+	{
+		c = s[i];
+		if (c == '.')
+		{
+			if (!allowDot || sawDot)
+				return (false);
+			sawDot = true;
+		}
+		else if (std::isdigit(static_cast<unsigned char>(c)))
+			sawDigit = true;
+		else
+			return (false);
+	}
+	return (true);
 }
 
-// int	parse(int argc, char **argv)
-// {
-// 	char *res;
+static bool	is_sfloat(const std::string &s, int *special)
+{
+	*special = (s == "nanf") ? 4 : (s == "-inff") ? 3 : (s == "+inff") ? 2 : *special;
+	return (s == "nanf" || s == "+inff" || s == "-inff");
+}
 
-// 	if (argc > 2 || argc < 2)
-// 		return (1);
-// 	res = argv[1];
-// }
+static int	is_float(const std::string &s, int *special) // 2 = +inff, 3 = -inff, 4 = nanf
+{
+	size_t	i;
+	bool	sawDot;
+	bool	sawDigit;
+
+
+	if (is_sfloat(s, special))
+		return (*special);
+	if (s.size() < 2 || s.back() != 'f')
+		return (false);
+	std::string core = s.substr(0, s.size() - 1);
+	if (core.empty())
+		return (false);
+	i = 0;
+	if (core[i] == '+' || core[i] == '-')
+		if (++i == core.size())
+			return (false);
+	sawDot = false;
+	sawDigit = false;
+	if (!is_numeric(core.substr(i), true, sawDot, sawDigit))
+		return false;
+	return sawDot && sawDigit;
+}
+
+static bool	is_sdouble(const std::string &s, int *special)
+{
+	*special = (s == "nan") ? 4 : (s == "-inf") ? 3 : (s == "+inf") ? 2 : *special;
+	return (s == "nan" || s == "+inf" || s == "-inf");
+}
+
+static int	is_double(const std::string &s, int *special) // 2 = +inf, 3 = -inf, 4 = nan
+{
+	size_t	i;
+	bool	sawDot;
+	bool	sawDigit;
+
+	if (is_sdouble(s, special))
+		return *special;
+	if (s.empty())
+		return false;
+	i = 0;
+	if (s[i] == '+' || s[i] == '-')
+	{
+		if (++i == s.size())
+			return false;
+	}
+	sawDot = false;
+	sawDigit = false;
+	if (!is_numeric(s.substr(i), true, sawDot, sawDigit))
+		return false;
+	return sawDot && sawDigit;
+}
+
+int	check_type(std::string input, int *special)
+{
+	int type = TYPE_INVALID;
+	type = (is_lchar(input) || is_schar(input)) ? TYPE_CHAR : (is_int(input)) ? TYPE_INT : (is_float(input, special)) ? TYPE_FLOAT : (is_double(input, special)) ? TYPE_DOUBLE : type;
+    return type;
+}
+
+int	parse(int argc, char **argv)
+{
+	s_values pvalue;
+	char	*res;
+	int		special = 0;
+	int		type = TYPE_INVALID;
+	
+	std::string special_cases[5] = {"", "", "+inf", "-inf", "nan"};
+	std::string fspecial_cases[5] = {"", "", "+inff", "-inff", "nanf"};
+
+	if (argc > 2 || argc < 2)
+		return (1);
+	res = argv[1];
+
+	type = check_type(res, &special);
+	// if (res < 0)
+	// {
+	// 	pvalue.integernum = "";
+	// }
+	std::cout << "result: " << type << std::endl;
+	if (special)
+	{
+		std::cout << "special: " << special << std::endl;
+	}
+	return 0;
+}
