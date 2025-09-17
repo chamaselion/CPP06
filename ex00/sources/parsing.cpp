@@ -6,7 +6,7 @@
 /*   By: bszikora <bszikora@student.42helbronn.d    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 12:55:03 by bszikora          #+#    #+#             */
-/*   Updated: 2025/09/17 13:33:53 by bszikora         ###   ########.fr       */
+/*   Updated: 2025/09/17 13:39:41 by bszikora         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,16 @@ static bool	is_int(const std::string &s)
 	{
 		return (false);
 	}
+}
+
+int	check_type(std::string input)
+{
+	if (is_lchar(input))
+		return TYPE_CHAR;
+	if (is_schar(input))
+		return TYPE_CHAR;
+	if (is_int(input))
+		return TYPE_INT;
 }
 
 // int	parse(int argc, char **argv)
