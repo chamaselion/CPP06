@@ -6,7 +6,7 @@
 /*   By: bszikora <bszikora@student.42helbronn.d    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 15:23:09 by bszikora          #+#    #+#             */
-/*   Updated: 2025/09/17 16:44:50 by bszikora         ###   ########.fr       */
+/*   Updated: 2025/09/30 17:12:17 by bszikora         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,13 @@ void itsa_char(s_values *info)
 }
 
 void itsa_int(s_values *info)
-{	
-	info->integernum = std::stoi(info->input);
+{
+    try {
+        info->integernum = std::stoi(info->input);
+    } catch (const std::out_of_range& e) {
+		info->int_possible = false;
+        
+    }
 	info->doublenum = static_cast<double>(info->integernum);
 	info->floatingnum = static_cast<float>(info->integernum);
 	info->charchar = static_cast<char>(info->integernum);
@@ -71,16 +76,40 @@ static bool is_print(char c)
 
 void print_cases(s_values *info)
 {
-	std::cout << "char: ";
-	if (is_print(info->charchar))
-		std::cout << info->charchar;
-	else
-		std::cout << "Non displayable";
-	std::cout << std::endl;
-	
-	std::cout << "int: " << info->integernum << std::endl;
-	std::cout << "float: " << info->floatingnum << std::endl;
-	std::cout << "double: " << info->doublenum << std::endl;
+    std::cout << "char: ";
+    if (!info->char_possible)
+        std::cout << "impossible";
+    else if (is_print(info->charchar))
+        std::cout << "'" << info->charchar << "'";
+    else
+        std::cout << "Non displayable";
+    std::cout << std::endl;
+    
+    std::cout << "int: ";
+    if (!info->int_possible)
+        std::cout << "impossible";
+    else
+        std::cout << info->integernum;
+    std::cout << std::endl;
+    
+    std::cout << "float: ";
+    if (!info->float_possible)
+        std::cout << "impossible";
+    else if (info->type == TYPE_INT || (info->floatingnum - static_cast<int>(info->floatingnum)) == 0)
+        std::cout << info->floatingnum << ".0f";
+    else
+        std::cout << info->floatingnum << "f";
+    std::cout << std::endl;
+    
+    std::cout << "double: ";
+    if (!info->double_possible) {
+        std::cout << "impossible";
+    } else if (info->type == TYPE_INT || (info->doublenum - static_cast<int>(info->doublenum)) == 0) {
+        std::cout << info->doublenum << ".0";
+    } else {
+        std::cout << info->doublenum;
+    }
+    std::cout << std::endl;
 }
 
 int handle_cases(s_values *info)
@@ -108,3 +137,4 @@ int handle_cases(s_values *info)
 	print_cases(info);
 	return 0;
 }
+

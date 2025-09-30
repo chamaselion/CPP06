@@ -6,7 +6,7 @@
 /*   By: bszikora <bszikora@student.42helbronn.d    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 13:16:18 by bszikora          #+#    #+#             */
-/*   Updated: 2025/09/17 16:34:16 by bszikora         ###   ########.fr       */
+/*   Updated: 2025/09/19 18:12:34 by bszikora         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 #include <iostream>
 #include <climits>
+#include <limits>
+#include <cfloat>
 #include <string>
 #include "ScalarConverter.hpp"
 
@@ -39,10 +41,17 @@ typedef struct Values
 
 	int				type;
 	int				special;
+
+	bool			char_possible;
+	bool			int_possible;
+	bool			float_possible;
+	bool			double_possible;
 } s_values;
 
-int	parse(int argc, char **argv, s_values *info);
+int	parse(int argc, char **argv);
 int special_case(int special);
 int handle_cases(s_values *info);
+int invalid_case(s_values *info);
+int	check_type(s_values *info);
 
 #endif

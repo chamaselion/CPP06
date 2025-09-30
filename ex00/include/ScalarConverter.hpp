@@ -6,7 +6,7 @@
 /*   By: bszikora <bszikora@student.42helbronn.d    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 16:54:10 by bszikora          #+#    #+#             */
-/*   Updated: 2025/09/15 13:29:50 by bszikora         ###   ########.fr       */
+/*   Updated: 2025/09/19 17:10:09 by bszikora         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #define SCALARCONVERTER_HPP
 
 #include <iostream>
+#include "Tools.hpp"
 
 class ScalarConverter
 {

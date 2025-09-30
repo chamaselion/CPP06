@@ -6,49 +6,65 @@
 /*   By: bszikora <bszikora@student.42helbronn.d    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/17 12:55:03 by bszikora          #+#    #+#             */
-/*   Updated: 2025/09/17 16:36:45 by bszikora         ###   ########.fr       */
+/*   Updated: 2025/09/30 17:12:53 by bszikora         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Tools.hpp"
 
-static bool	is_lchar(const std::string &s)
+static bool are_u_asci(s_values *info, int l_or_s) // 0 = l
 {
-	return (s.size() == 3 && s.front() == '\'' && s.back() == '\''
-		&& std::isprint(static_cast<unsigned char>(s[1])));
+    (void) l_or_s;
+        if (std::stold(info->input) > 127)
+        {
+            info->char_possible = false;
+            return 1;
+        }
+    return 0;
 }
 
-static bool	is_schar(const std::string &s)
+static bool	is_lchar(s_values *info)
 {
-	return (s.size() == 1 && std::isprint(static_cast<unsigned char>(s[0]))
-		&& !std::isdigit(static_cast<unsigned char>(s[0])));
+	are_u_asci(info, 0);
+	return (info->input.size() == 3 && info->input.front() == '\'' && info->input.back() == '\''
+		&& std::isprint(static_cast<unsigned char>(info->input[1])));
 }
 
-static bool	is_int(const std::string &s)
+static bool	is_schar(s_values *info)
 {
-	size_t		i;
-	long long	v;
+	are_u_asci(info, 1);
+	return (info->input.size() == 1 && std::isprint(static_cast<unsigned char>(info->input[0]))
+		&& !std::isdigit(static_cast<unsigned char>(info->input[0])));
+}
 
-	if (s.empty())
-		return (false);
-	i = 0;
-	if (s[i] == '+' || s[i] == '-')
-	{
-		if (++i == s.size())
-			return (false);
-	}
-	for (; i < s.size(); ++i)
-		if (!std::isdigit(static_cast<unsigned char>(s[i])))
-			return (false);
-	try
-	{
-		v = std::stoll(s);
-		return (v >= INT_MIN && v <= INT_MAX);
-	}
-	catch (...)
-	{
-		return (false);
-	}
+static bool is_int(s_values *info)
+{
+    size_t i = 0;
+    long long v;
+
+    if (info->input.empty())
+        return false;
+    if (info->input[i] == '+' || info->input[i] == '-') {
+        if (++i == info->input.size())
+            return false;
+    }
+    for (; i < info->input.size(); ++i) {
+        if (!std::isdigit(static_cast<unsigned char>(info->input[i])))
+            return false;
+    }
+    try {
+        v = std::stoll(info->input);
+        if (v < INT_MIN || v > INT_MAX) {
+            info->int_possible = false;
+        }
+        return true;
+    } catch (const std::out_of_range &) {
+        info->int_possible = false;
+        return false;
+    } catch (...) {
+        info->int_possible = false;
+        return false;
+    }
 }
 
 static bool	is_numeric(const std::string &s, bool allowDot, bool &sawDot, bool &sawDigit)
@@ -72,92 +88,99 @@ static bool	is_numeric(const std::string &s, bool allowDot, bool &sawDot, bool &
 	return (true);
 }
 
-static bool	is_sfloat(const std::string &s, int *special)
+static bool	is_sfloat(s_values *info)
 {
-	*special = (s == "nanf") ? 4 : (s == "-inff") ? 3 : (s == "+inff") ? 2 : *special;
-	return (s == "nanf" || s == "+inff" || s == "-inff");
+    info->special = (info->input == "nanf") ? 4 : (info->input == "-inff") ? 3 : (info->input == "+inff") ? 2 : info->special;
+    return (info->input == "nanf" || info->input == "+inff" || info->input == "-inff");
 }
 
-static int	is_float(const std::string &s, int *special) // 2 = +inff, 3 = -inff, 4 = nanf
+static int	is_float(s_values *info)
 {
-	size_t	i;
-	bool	sawDot;
-	bool	sawDigit;
+    size_t i = 0;
+    bool sawDot = false;
+    bool sawDigit = false;
 
+    if (is_sfloat(info))
+        return info->special;
+    if (info->input.size() < 2 || info->input.back() != 'f')
+        return false;
+    std::string core = info->input.substr(0, info->input.size() - 1);
+    if (core.empty())
+        return false;
+    if (core[i] == '+' || core[i] == '-') {
+        if (++i == core.size())
+            return false;
+    }
+    if (!is_numeric(core.substr(i), true, sawDot, sawDigit))
+        return false;
 
-	if (is_sfloat(s, special))
-		return (*special);
-	if (s.size() < 2 || s.back() != 'f')
-		return (false);
-	std::string core = s.substr(0, s.size() - 1);
-	if (core.empty())
-		return (false);
-	i = 0;
-	if (core[i] == '+' || core[i] == '-')
-		if (++i == core.size())
-			return (false);
-	sawDot = false;
-	sawDigit = false;
-	if (!is_numeric(core.substr(i), true, sawDot, sawDigit))
-		return false;
-	return sawDot && sawDigit;
+    try {
+        std::stof(core);
+        return sawDot && sawDigit;
+    } catch (const std::out_of_range &) {
+        info->float_possible = false;
+        return false;
+    } catch (...) {
+        info->float_possible = false;
+        return false;
+    }
 }
 
-static bool	is_sdouble(const std::string &s, int *special)
+static bool	is_sdouble(s_values *info)
 {
-	*special = (s == "nan") ? 4 : (s == "-inf") ? 3 : (s == "+inf") ? 2 : *special;
-	return (s == "nan" || s == "+inf" || s == "-inf");
+    info->special = (info->input == "nan") ? 4 : (info->input == "-inf") ? 3 : (info->input == "+inf") ? 2 : info->special;
+    return (info->input == "nan" || info->input == "+inf" || info->input == "-inf");
 }
 
-static int	is_double(const std::string &s, int *special) // 2 = +inf, 3 = -inf, 4 = nan
+static int	is_double(s_values *info)
 {
-	size_t	i;
-	bool	sawDot;
-	bool	sawDigit;
+    size_t i = 0;
+    bool sawDot = false;
+    bool sawDigit = false;
 
-	if (is_sdouble(s, special))
-		return *special;
-	if (s.empty())
-		return false;
-	i = 0;
-	if (s[i] == '+' || s[i] == '-')
-	{
-		if (++i == s.size())
-			return false;
-	}
-	sawDot = false;
-	sawDigit = false;
-	if (!is_numeric(s.substr(i), true, sawDot, sawDigit))
-		return false;
-	return sawDot && sawDigit;
+    if (is_sdouble(info))
+        return info->special;
+    if (info->input.empty())
+        return false;
+    if (info->input[i] == '+' || info->input[i] == '-') {
+        if (++i == info->input.size())
+            return false;
+    }
+    if (!is_numeric(info->input.substr(i), true, sawDot, sawDigit))
+        return false;
+
+    try {
+        std::stod(info->input);
+        info->double_possible = true;
+        return sawDot && sawDigit;
+    } catch (const std::out_of_range &) {
+        info->double_possible = true;
+        return sawDot && sawDigit;
+    } catch (...) {
+        info->double_possible = false;
+        return false;
+    }
 }
 
-int	check_type(std::string input, int *special)
+int check_type(s_values *info)
 {
-	int type = TYPE_INVALID;
-	type = (is_lchar(input) || is_schar(input)) ? TYPE_CHAR : (is_int(input)) ? TYPE_INT : (is_float(input, special)) ? TYPE_FLOAT : (is_double(input, special)) ? TYPE_DOUBLE : type;
+    int type = TYPE_INVALID;
+    type = (is_lchar(info) || is_schar(info)) ? TYPE_CHAR : (is_int(info)) ? TYPE_INT : (is_float(info)) ? TYPE_FLOAT : (is_double(info)) ? TYPE_DOUBLE : type;
+    info->type = type;
     return type;
 }
 
-int invalid_case(int type)
+int invalid_case(s_values *info)
 {
-	if (type < 0)
-		return (std::cout << "This input is invalid for such conversions\n", 1);
-	return 0;
+    if (info->type < 0)
+        return (std::cout << "This input is invalid for such conversions\n", 1);
+    return 0;
 }
 
-int	parse(int argc, char **argv, s_values *info)
+int	parse(int argc, char **argv)
 {
-	info->input = argv[1];
-	info->special = 0;
-	info->type = TYPE_INVALID;
-
+	(void) argv;
 	if (argc > 2 || argc < 2)
-		return 1;
-	info->type = check_type(info->input, &info->special);
-	if (invalid_case(info->type))
-		return 1;
-	if (special_case(info->special))
 		return 1;
 	return 0;
 }
